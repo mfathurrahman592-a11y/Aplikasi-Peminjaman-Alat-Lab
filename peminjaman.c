@@ -38,4 +38,41 @@ void loadAkun() {
 
     fclose(file);
 }
+// Membaca data alat dari file
+void loadAlat() {
+    FILE *file = fopen("alat.txt", "r");
+    if (file == NULL) {
+        printf("File alat tidak ditemukan!\n");
+        return;
+    }
+
+    while (fscanf(file, "%s %d",
+                  alat[jumlahAlat].nama,
+                  &alat[jumlahAlat].stok) != EOF) {
+        jumlahAlat++;
+    }
+
+    fclose(file);
+}
+
+// Menyimpan data alat ke file
+void saveAlat() {
+    FILE *file = fopen("alat.txt", "w");
+
+    for (int i = 0; i < jumlahAlat; i++) {
+        fprintf(file, "%s %d\n",
+                alat[i].nama,
+                alat[i].stok);
+    }
+
+    fclose(file);
+}
+
+// Simpan data peminjaman
+void simpanPeminjaman(char username[], char namaAlat[]) {
+    FILE *file = fopen("peminjaman.txt", "a");
+    fprintf(file, "%s %s 1\n", username, namaAlat);
+    fclose(file);
+}
+
 }
