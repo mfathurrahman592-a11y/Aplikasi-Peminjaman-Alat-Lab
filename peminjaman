@@ -1,0 +1,227 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define MAX 100
+
+struct Akun {
+    char username[50];
+    char password[50];
+    char role[20];
+};
+
+struct Alat {
+    char nama[50];
+    int stok;
+};
+
+struct Akun akun[MAX];
+struct Alat alat[MAX];
+
+int jumlahAkun = 0;
+int jumlahAlat = 0;
+
+// Membaca data akun dari file
+void loadAkun() {
+    FILE *file = fopen("akun.txt", "r");
+    if (file == NULL) {
+        printf("File akun tidak ditemukan!\n");
+        return;
+    }
+
+    while (fscanf(file, "%s %s %s",
+                  akun[jumlahAkun].username,
+                  akun[jumlahAkun].password,
+                  akun[jumlahAkun].role) != EOF) {
+        jumlahAkun++;
+    }
+
+    fclose(file);
+}
+
+// Membaca data alat dari file
+void loadAlat() {
+    FILE *file = fopen("alat.txt", "r");
+    if (file == NULL) {
+        printf("File alat tidak ditemukan!\n");
+        return;
+    }
+
+    while (fscanf(file, "%s %d",
+                  alat[jumlahAlat].nama,
+                  &alat[jumlahAlat].stok) != EOF) {
+        jumlahAlat++;
+    }
+
+    fclose(file);
+}
+
+// Menyimpan data alat ke file
+void saveAlat() {
+    FILE *file = fopen("alat.txt", "w");
+
+    for (int i = 0; i < jumlahAlat; i++) {
+        fprintf(file, "%s %d\n",
+                alat[i].nama,
+                alat[i].stok);
+    }
+
+    fclose(file);
+}
+
+// Simpan data peminjaman
+void simpanPeminjaman(char username[], char namaAlat[]) {
+    FILE *file = fopen("peminjaman.txt", "a");
+    fprintf(file, "%s %s 1\n", username, namaAlat);
+    fclose(file);
+}
+
+// ================= MENU ADMIN =================
+void menuAdmin() {
+    int pilihan, nomor;
+    char namaBaru[50];
+    int stokBaru;
+
+    do {
+        printf("\n=== MENU ADMIN ===\n");
+        printf("1. Lihat Data Alat\n");
+        printf("2. Tambah Alat\n");
+        printf("3. Update Alat\n");
+        printf("4. Hapus Alat\n");
+        printf("5. Logout\n");
+        printf("Pilih: ");
+        scanf("%d", &pilihan);
+
+        switch (pilihan) {
+            case 1:
+                printf("\n=== DATA ALAT ===\n");
+                for (int i = 0; i < jumlahAlat; i++) {
+                    printf("%d. %s - Stok: %d\n",
+                           i + 1,
+                           alat[i].nama,
+                           alat[i].stok);
+                }
+                printf("\nTekan Enter...");
+                getchar();
+                getchar();
+                break;
+
+            case 2:
+                printf("Nama alat: ");
+                scanf("%s", alat[jumlahAlat].nama);
+
+                printf("Stok: ");
+                scanf("%d", &alat[jumlahAlat].stok);
+
+                jumlahAlat++;
+                saveAlat();
+
+                printf("Alat berhasil ditambahkan!\n");
+                break;
+
+            case 3:
+                printf("\n=== DATA ALAT ===\n");
+                for (int i = 0; i < jumlahAlat; i++) {
+                    printf("%d. %s - Stok: %d\n",
+                           i + 1,
+                           alat[i].nama,
+                           alat[i].stok);
+                }
+                printf("%d. Batal\n", jumlahAlat + 1);
+                printf("Pilih nomor alat yang ingin diupdate: ");
+                scanf("%d", &nomor);
+                if (nomor == jumlahAlat + 1) {
+                    break;
+                }
+
+                if (nomor >= 1 && nomor <= jumlahAlat) {
+                    printf("Nama baru: ");
+                    scanf("%s", namaBaru);
+
+                    printf("Stok baru: ");
+                    scanf("%d", &stokBaru);
+
+                    strcpy(alat[nomor - 1].nama, namaBaru);
+                    alat[nomor - 1].stok = stokBaru;
+
+                    saveAlat();
+                    printf("Data berhasil diupdate!\n");
+                } else {
+                    printf("Nomor tidak valid!\n");
+                }
+                break;
+
+            case 4:
+                for (int i = 0; i < jumlahAlat; i++) {
+                    printf("%d. %s - Stok: %d\n",
+                           i + 1,
+                           alat[i].nama,
+                           alat[i].stok);
+                }
+                printf("%d. Batal\n", jumlahAlat + 1);
+
+                printf("Pilih nomor alat yang ingin dihapus: ");
+                scanf("%d", &nomor);
+                if (nomor == jumlahAlat + 1) {
+                    break;
+                }
+
+
+                if (nomor >= 1 && nomor <= jumlahAlat) {
+                    for (int i = nomor - 1; i < jumlahAlat - 1; i++) {
+                        alat[i] = alat[i + 1];
+                    }
+
+                    jumlahAlat--;
+                    saveAlat();
+
+                    printf("Data berhasil dihapus!\n");
+                } else {
+                    printf("Nomor tidak valid!\n");
+                }
+                break;
+        }
+
+    } while (pilihan != 5);
+}
+
+// ================= LOGIN CLA =================
+void loginCLA(char username[], char password[]) {
+    int berhasil = 0;
+
+    for (int i = 0; i < jumlahAkun; i++) {
+        if (strcmp(username, akun[i].username) == 0 &&
+            strcmp(password, akun[i].password) == 0) {
+
+            berhasil = 1;
+
+            printf("Login berhasil sebagai %s\n", akun[i].role);
+
+            if (strcmp(akun[i].role, "admin") == 0) {
+                menuAdmin();
+            } else {
+                menuUser(username);
+            }
+            break;
+        }
+    }
+
+    if (!berhasil) {
+        printf("Login gagal! Username atau password salah.\n");
+    }
+}
+
+// ================= MAIN =================
+int main(int argc, char *argv[]) {
+    loadAkun();
+    loadAlat();
+
+    if (argc != 3) {
+        printf("Cara penggunaan: %s <username> <password>\n", argv[0]);
+        return 1;
+    }
+
+    loginCLA(argv[1], argv[2]);
+
+    return 0;
+}
