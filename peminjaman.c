@@ -8,9 +8,14 @@ struct Akun {
     char username[50], password[50], role[20];
 };
 
+
 struct Alat {
+    int id;
     char nama[50];
-    int stok;
+    char merek[50];
+    char model[50];
+    int tahunProduksi;
+    int jumlahUnit;
 };
 
 struct Akun akun[MAX];
@@ -24,14 +29,30 @@ void garis() {
 
 void tampilAlat() {
     printf("\n=== DATA ALAT ===\n");
-    for (int i = 0; i < jumlahAlat; i++)
-        printf("|%2d| |%-20s| stock %3d|\n", i + 1, alat[i].nama, alat[i].stok);
+    for (int i = 0; i < jumlahAlat; i++) {
+        printf("|%2d| ID:%d | %-10s | %-10s | %-10s | %d | stok %3d|\n",
+            i + 1,
+            alat[i].id,
+            alat[i].nama,
+            alat[i].merek,
+            alat[i].model,
+            alat[i].tahunProduksi,
+            alat[i].jumlahUnit);
+    }
 }
+
 
 void saveAlat() {
     FILE *file = fopen("alat.txt", "w");
-    for (int i = 0; i < jumlahAlat; i++)
-        fprintf(file, "%s %d\n", alat[i].nama, alat[i].stok);
+    for (int i = 0; i < jumlahAlat; i++) {
+        fprintf(file, "%d %s %s %s %d %d\n",
+            alat[i].id,
+            alat[i].nama,
+            alat[i].merek,
+            alat[i].model,
+            alat[i].tahunProduksi,
+            alat[i].jumlahUnit);
+    }
     fclose(file);
 }
 // simpan peminjaman alat
@@ -68,14 +89,18 @@ void loadAlat() {
         return;
     }
 
-    while (fscanf(file, "%s %d",
+    while (fscanf(file, "%d %s %s %s %d %d",
+                  &alat[jumlahAlat].id,
                   alat[jumlahAlat].nama,
-                  &alat[jumlahAlat].stok) != EOF) {
+                  alat[jumlahAlat].merek,
+                  alat[jumlahAlat].model,
+                  &alat[jumlahAlat].tahunProduksi,
+                  &alat[jumlahAlat].jumlahUnit) != EOF) {
         jumlahAlat++;
     }
 
     fclose(file);
-}
+} 
 
 void menuAdmin() {
     int pilih, nomor;
@@ -101,10 +126,23 @@ void menuAdmin() {
                 break;
 
             case 2:
+                printf("ID Alat: ");
+                scanf("%d", &alat[jumlahAlat].id);
+
                 printf("Nama alat: ");
                 scanf("%s", alat[jumlahAlat].nama);
-                printf("Stok: ");
-                scanf("%d", &alat[jumlahAlat].stok);
+
+                printf("Merek: ");
+                scanf("%s", alat[jumlahAlat].merek);
+
+                printf("Model: ");
+                scanf("%s", alat[jumlahAlat].model);
+
+                printf("Tahun Produksi: ");
+                scanf("%d", &alat[jumlahAlat].tahunProduksi);
+
+                printf("Jumlah Unit: ");
+                scanf("%d", &alat[jumlahAlat].jumlahUnit);
 
                 jumlahAlat++;
                 saveAlat();
@@ -120,18 +158,28 @@ void menuAdmin() {
                 scanf("%d", &nomor);
 
                 if (nomor >= 1 && nomor <= jumlahAlat) {
-                    printf("Nama baru: ");
-                    scanf("%s", nama);
-                    printf("Stok baru: ");
-                    scanf("%d", &stok);
+                    printf("ID baru: ");
+                    scanf("%d", &alat[nomor - 1].id);
 
-                    strcpy(alat[nomor - 1].nama, nama);
-                    alat[nomor - 1].stok = stok;
+                    printf("Nama baru: ");
+                    scanf("%s", alat[nomor - 1].nama);
+
+                    printf("Merek baru: ");
+                    scanf("%s", alat[nomor - 1].merek);
+
+                    printf("Model baru: ");
+                    scanf("%s", alat[nomor - 1].model);
+
+                    printf("Tahun Produksi baru: ");
+                    scanf("%d", &alat[nomor - 1].tahunProduksi);
+
+                    printf("Jumlah Unit baru: ");
+                    scanf("%d", &alat[nomor - 1].jumlahUnit);
 
                     saveAlat();
 
                     printf("\n====================================\n");
-                    printf(" Data alat berhasil diupdate!\n");
+                    printf("Data alat berhasil diupdate!\n");
                     printf("====================================\n");
                 } else {
                     printf("Update dibatalkan atau nomor tidak valid!\n");
