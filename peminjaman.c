@@ -162,6 +162,75 @@ void menuAdmin() {
     } while (pilih != 5);
 }
 
+void menuUser(char username[]) {
+    int pilih, nomor;
+
+    do {
+        printf("\n=== MENU USER ===\n");
+        printf("1. Lihat Alat\n");
+        printf("2. Pinjam Alat\n");
+        printf("3. Lihat Peminjaman\n");
+        printf("4. Kembalikan Alat\n");
+        printf("5. Logout\n");
+        printf("Pilih: ");
+        scanf("%d", &pilih);
+
+        switch (pilih) {
+
+            case 1:
+                garis();
+                printf("DAFTAR ALAT TERSEDIA\n");
+                garis();
+                tampilAlatUser();
+
+                printf("\nTekan Enter...");
+                getchar(); getchar();
+                break;
+
+            case 2:
+                tampilAlatUser();
+                printf("%d. Batal\nPilih: ", jumlahAlat + 1);
+                scanf("%d", &nomor);
+
+                if (nomor == jumlahAlat + 1) {
+                    printf("Peminjaman dibatalkan.\n");
+                    break;
+                }
+
+                if (nomor >= 1 && nomor <= jumlahAlat) {
+                    if (alat[nomor - 1].stok > 0) {
+                        alat[nomor - 1].stok--;
+                        saveAlat();
+                        simpanPeminjaman(username, alat[nomor - 1].nama);
+
+                        printf("\n====================================\n");
+                        printf("Berhasil meminjam alat: %s\n", alat[nomor - 1].nama);
+                        printf("====================================\n");
+                    } else {
+                        printf("Stok habis!\n");
+                    }
+                } else {
+                    printf("Pilihan tidak valid!\n");
+                }
+                break;
+
+            case 3:
+                lihatPeminjaman(username);
+                break;
+
+            case 4:
+                lihatPeminjaman(username);
+                kembalikanAlat(username);
+
+                printf("\n====================================\n");
+                printf("Proses pengembalian selesai!\n");
+                printf("====================================\n");
+                break;
+        }
+
+    } while (pilih != 5);
+}
+
 // ================= LOGIN CLA =================
 void loginCLA(char username[], char password[]) {
     int berhasil = 0;
