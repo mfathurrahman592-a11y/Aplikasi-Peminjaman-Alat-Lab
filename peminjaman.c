@@ -5,9 +5,7 @@
 #define MAX 100
 
 struct Akun {
-    char username[50];
-    char password[50];
-    char role[20];
+    char username[50], password[50], role[20];
 };
 
 struct Alat {
@@ -18,8 +16,31 @@ struct Alat {
 struct Akun akun[MAX];
 struct Alat alat[MAX];
 
-int jumlahAkun = 0;
-int jumlahAlat = 0;
+int jumlahAkun = 0, jumlahAlat = 0;
+
+void garis() {
+    printf("========================================\n");
+}
+
+void tampilAlat() {
+    printf("\n=== DATA ALAT ===\n");
+    for (int i = 0; i < jumlahAlat; i++)
+        printf("|%2d| |%-20s| stock %3d|\n", i + 1, alat[i].nama, alat[i].stok);
+}
+
+void saveAlat() {
+    FILE *file = fopen("alat.txt", "w");
+    for (int i = 0; i < jumlahAlat; i++)
+        fprintf(file, "%s %d\n", alat[i].nama, alat[i].stok);
+    fclose(file);
+}
+// simpan peminjaman alat
+void simpanPeminjaman(char username[], char namaAlat[]) {
+    FILE *file = fopen("peminjaman.txt", "a");
+    fprintf(file, "%s %s 1\n", username, namaAlat);
+    fclose(file);
+}
+
 
 // Membaca data akun dari file
 void loadAkun() {
@@ -56,31 +77,10 @@ void loadAlat() {
     fclose(file);
 }
 
-// Menyimpan data alat ke file
-void saveAlat() {
-    FILE *file = fopen("alat.txt", "w");
-
-    for (int i = 0; i < jumlahAlat; i++) {
-        fprintf(file, "%s %d\n",
-                alat[i].nama,
-                alat[i].stok);
-    }
-
-    fclose(file);
-}
-
-// Simpan data peminjaman
-void simpanPeminjaman(char username[], char namaAlat[]) {
-    FILE *file = fopen("peminjaman.txt", "a");
-    fprintf(file, "%s %s 1\n", username, namaAlat);
-    fclose(file);
-}
-
-// ================= MENU ADMIN =================
 void menuAdmin() {
-    int pilihan, nomor;
-    char namaBaru[50];
-    int stokBaru;
+    int pilih, nomor;
+    char nama[50];
+    int stok;
 
     do {
         printf("\n=== MENU ADMIN ===\n");
@@ -90,102 +90,77 @@ void menuAdmin() {
         printf("4. Hapus Alat\n");
         printf("5. Logout\n");
         printf("Pilih: ");
-        scanf("%d", &pilihan);
+        scanf("%d", &pilih);
 
-        switch (pilihan) {
+        switch (pilih) {
+
             case 1:
-                printf("\n=== DATA ALAT ===\n");
-                for (int i = 0; i < jumlahAlat; i++) {
-                    printf("%d. %s - Stok: %d\n",
-                           i + 1,
-                           alat[i].nama,
-                           alat[i].stok);
-                }
+                tampilAlat();
                 printf("\nTekan Enter...");
-                getchar();
-                getchar();
+                getchar(); getchar();
                 break;
 
             case 2:
                 printf("Nama alat: ");
                 scanf("%s", alat[jumlahAlat].nama);
-
                 printf("Stok: ");
                 scanf("%d", &alat[jumlahAlat].stok);
 
                 jumlahAlat++;
                 saveAlat();
 
-                printf("Alat berhasil ditambahkan!\n");
+                printf("\n====================================\n");
+                printf("Data alat berhasil ditambahkan!\n");
+                printf("====================================\n");
                 break;
 
             case 3:
-                printf("\n=== DATA ALAT ===\n");
-                for (int i = 0; i < jumlahAlat; i++) {
-                    printf("%d. %s - Stok: %d\n",
-                           i + 1,
-                           alat[i].nama,
-                           alat[i].stok);
-                }
-                printf("%d. Batal\n", jumlahAlat + 1);
-                printf("Pilih nomor alat yang ingin diupdate: ");
+                tampilAlat();
+                printf("%d. Batal\nPilih: ", jumlahAlat + 1);
                 scanf("%d", &nomor);
-                if (nomor == jumlahAlat + 1) {
-                    break;
-                }
 
                 if (nomor >= 1 && nomor <= jumlahAlat) {
                     printf("Nama baru: ");
-                    scanf("%s", namaBaru);
-
+                    scanf("%s", nama);
                     printf("Stok baru: ");
-                    scanf("%d", &stokBaru);
+                    scanf("%d", &stok);
 
-                    strcpy(alat[nomor - 1].nama, namaBaru);
-                    alat[nomor - 1].stok = stokBaru;
+                    strcpy(alat[nomor - 1].nama, nama);
+                    alat[nomor - 1].stok = stok;
 
                     saveAlat();
-                    printf("Data berhasil diupdate!\n");
+
+                    printf("\n====================================\n");
+                    printf(" Data alat berhasil diupdate!\n");
+                    printf("====================================\n");
                 } else {
-                    printf("Nomor tidak valid!\n");
+                    printf("Update dibatalkan atau nomor tidak valid!\n");
                 }
                 break;
 
             case 4:
-                for (int i = 0; i < jumlahAlat; i++) {
-                    printf("%d. %s - Stok: %d\n",
-                           i + 1,
-                           alat[i].nama,
-                           alat[i].stok);
-                }
-                printf("%d. Batal\n", jumlahAlat + 1);
-
-                printf("Pilih nomor alat yang ingin dihapus: ");
+                tampilAlat();
+                printf("%d. Batal\nPilih: ", jumlahAlat + 1);
                 scanf("%d", &nomor);
-                if (nomor == jumlahAlat + 1) {
-                    break;
-                }
-
 
                 if (nomor >= 1 && nomor <= jumlahAlat) {
-                    for (int i = nomor - 1; i < jumlahAlat - 1; i++) {
+                    for (int i = nomor - 1; i < jumlahAlat - 1; i++)
                         alat[i] = alat[i + 1];
-                    }
 
                     jumlahAlat--;
                     saveAlat();
 
-                    printf("Data berhasil dihapus!\n");
+                    printf("\n====================================\n");
+                    printf("Data alat berhasil dihapus!\n");
+                    printf("====================================\n");
                 } else {
-                    printf("Nomor tidak valid!\n");
+                    printf("Hapus dibatalkan atau nomor tidak valid!\n");
                 }
                 break;
         }
 
-    } while (pilihan != 5);
+    } while (pilih != 5);
 }
-
-
 
 // ================= LOGIN CLA =================
 void loginCLA(char username[], char password[]) {
