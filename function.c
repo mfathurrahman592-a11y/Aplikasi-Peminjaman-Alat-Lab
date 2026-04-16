@@ -119,7 +119,7 @@ void menuAdmin() {
 
             case 3:
                 tampilAlat();
-                printf("%d. Batal\nPilih: ", jumlahAlat + 1);
+                printf("%d. Batal\nPilih: ", 0);
                 scanf("%d", &nomor);
 
                 if (nomor >= 1 && nomor <= jumlahAlat) {
@@ -153,7 +153,7 @@ void menuAdmin() {
 
             case 4:
                 tampilAlat();
-                printf("%d. Batal\nPilih: ", jumlahAlat + 1);
+                printf("%d. Batal\nPilih: ", 0);
                 scanf("%d", &nomor);
 
                 if (nomor >= 1 && nomor <= jumlahAlat) {
